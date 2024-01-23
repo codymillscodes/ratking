@@ -1,0 +1,5 @@
+__pycache__
+maps/
+*.json
+*.7z
+*.mjs
