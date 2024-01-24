@@ -76,36 +76,51 @@ ammo_cheatsheet = [
 ]
 
 
-def update_all():
-    queries = [
-        gquery.get_barters(),
-        gquery.get_bosses(),
-        gquery.get_crafts(),
-        gquery.get_flea(),
-        gquery.get_hideout(),
-        gquery.get_items(),
-        gquery.get_maps(),
-        gquery.get_traders(),
-    ]
-    filenames = [
-        "barters",
-        "bosses",
-        "crafts",
-        "flea",
-        "hideout",
-        "items",
-        "maps",
-        "traders",
-    ]
-    for q, fn in zip(queries, filenames):
-        transport = AIOHTTPTransport(url="https://api.tarkov.dev/graphql")
-        client = Client(transport=transport, fetch_schema_from_transport=True)
-        result = client.execute(q)
-        # boss_json = json.loads(result)
-        print(f"updating {fn}")
-        with open(f"{fn}.json", "w") as f:
-            json.dump(result, f)
+def update_ammo():
+    print("updating ammo")
+    with open("db/items.json") as f:
+        items = json.load(f)
 
+    ammo = {"ammo": []}
+    for i in items["items"]:
+        if i["category"]["name"] == "Ammo":
+            ammo["ammo"].append(i)
+
+    if ammo["ammo"]:
+        with open("db/ammo.json", "w") as f:
+            json.dump(ammo, f)
+
+
+def update(field="all"):
+    query = gquery.update(field)
+    transport = AIOHTTPTransport(url="https://api.tarkov.dev/graphql")
+    client = Client(transport=transport, fetch_schema_from_transport=True)
+    if query:
+        if field == "all":
+            for q in query:
+                result = client.execute(gql(query[q]))
+                # boss_json = json.loads(result)
+                print(f"updating {q}")
+                with open(f"db/{q}.json", "w") as f:
+                    json.dump(result, f)
+
+                if q == "items":
+                    update_ammo()
+
+        else:
+            result = client.execute(gql(query))
+            print(f"updating {field}")
+            with open(f"db/{field}.json", "w") as f:
+                json.dump(result, f)
+
+            if field == "items":
+                update_ammo()
+
+        return "update complete."
+    return "Valid things to update are all, barters, bosses, crafts, flea, hideout, items, maps, tasks, traders."
+
+
+def update_all():
     with open("items.json") as f:
         items = json.load(f)
 
@@ -215,7 +230,8 @@ def main():
             cal = " ".join(command.split()[1:])
             search_ammo(cal)
         elif command.startswith("u"):
-            update_all()
+            field = " ".join(command.split()[1:])
+            update(field)
         elif command.startswith("quit"):
             sys.exit()
         elif command.startswith("i"):

@@ -1,39 +1,132 @@
-from gql import gql
-
-
-def get_bosses():
-    query = gql(
-        """
-    query GetBosses {
-        bosses {
-            name
-            normalizedName
-            imagePortraitLink
-            health {
-                max
-            }
-            equipment {
-                item {
+tdev_queries = {
+    "barters": """
+        query StashBarters {
+            barters {
+                id
+                trader {
                     id
-                    containsItems {
-                        item {
-                            id
+                }
+                level
+                taskUnlock {
+                    id
+                }
+                requiredItems {
+                    item {
+                        id
+                    }
+                    attributes {
+                        name
+                        value
+                    }
+                    count
+                }
+                rewardItems {
+                    item {
+                        id
+                    }
+                    count
+                }
+            }
+        }
+    """,
+    "bosses": """
+        query Bosses {
+            bosses {
+                id
+                name
+                normalizedName
+                health {
+                    max
+                }
+                equipment {
+                    item {
+                        id
+                        containsItems {
+                            item {
+                                id
+                            }
                         }
                     }
                 }
-            }
-            items {
-                id
+                items {
+                    id
+                }    
             }
         }
-    }"""
-    )
-    return query
-
-
-def get_items():
-    query = gql(
-        """query StashItems {
+        """,
+    "crafts": """
+            query Crafts {
+                crafts {
+                    id
+                    station {
+                        id
+                        name
+                    }
+                    level
+                    duration
+                    requiredItems {
+                        item {
+                            id
+                        }
+                        count
+                        attributes {
+                            type
+                            value
+                        }
+                    }
+                    rewardItems {
+                        item {
+                            id
+                        }
+                        count
+                    }
+                }
+            }
+            """,
+    "hideout": """
+        query Hideout {
+            hideoutStations {
+                id
+                tarkovDataId
+                name
+                levels {
+                    id
+                    tarkovDataId
+                    level
+                    constructionTime
+                    itemRequirements {
+                        id
+                        count
+                        quantity
+                    }
+                    stationLevelRequirements {
+                        id
+                        station {
+                            id
+                            name
+                        }
+                        level
+                    }
+                    skillRequirements {
+                        name
+                        level
+                    }
+                    traderRequirements {
+                        id
+                        trader {
+                            id
+                            name
+                        }
+                        requirementType
+                        compareMethod
+                        value
+                    }
+                }
+            }
+        }
+        """,
+    "items": """
+        query StashItems {
         items {
             id
             name
@@ -52,13 +145,31 @@ def get_items():
             properties {
                 ...on ItemPropertiesAmmo {
                     caliber
+                    stackMaxSize
+                    tracer
+                    tracerColor
+                    ammoType
+                    projectileCount
                     penetrationPower
                     damage
                     armorDamage
                     fragmentationChance
                     initialSpeed
+                    ricochetChance
+                    penetrationChance
+                    accuracyModifier
+                    recoilModifier
+                    lightBleedModifier
+                    heavyBleedModifier
+                    durabilityBurnFactor
+                    heatFactor
+                    staminaBurnPerDamage
+                    ballisticCoeficient
+                    bulletDiameterMilimeters
+                    bulletMassGrams
+
                 }
-                ...on ItemPropertiesStim {
+                ...on ItemPropertiesStim{
                     cures
                     stimEffects {
                         type
@@ -70,7 +181,35 @@ def get_items():
                         skillName
                     }
                 }
-                ...on ItemPropertiesWeapon {
+                ...on ItemPropertiesWeapon{
+                    caliber
+                    defaultAmmo {
+                        id
+                        name
+                    }
+                    effectiveDistance
+                    ergonomics
+                    fireModes
+                    fireRate
+                    maxDurability
+                    recoilVertical
+                    recoilHorizontal
+                    repairCost
+                    sightingRange
+                    centerOfImpact
+                    deviationCurve
+                    recoilDispersion
+                    recoilAngle
+                    cameraRecoil
+                    cameraSnap
+                    deviationMax
+                    convergence
+                    defaultWidth
+                    defaultHeight
+                    defaultErgonomics
+                    defaultRecoilVertical
+                    defaultRecoilHorizontal
+                    defaultWeight
                     defaultPreset {
                         iconLink
                         width
@@ -157,180 +296,431 @@ def get_items():
                 id
             }
         }
-    }"""
-    )
-    return query
-
-
-def get_maps():
-    query = gql(
-        """query StashMaps {
-        maps {
-            id
-            tarkovDataId
-            name
-            normalizedName
-            wiki
-            description
-            enemies
-            raidDuration
-            players
-            bosses {
-                name
-                normalizedName
-                spawnChance
-                spawnLocations {
-                    name
-                    chance
-                }
-                escorts {
-                    name
-                    normalizedName
-                    amount {
-                        count
-                        chance
-                    }
-                }
-                spawnTime
-                spawnTimeRandom
-                spawnTrigger
-            }
-            accessKeys {
-                id
-            }
-            accessKeysMinPlayerLevel
-            }
-        }"""
-    )
-    return query
-
-
-def get_traders():
-    query = gql(
-        """
-        query Traders{
-            traders{
+    }
+    """,
+    "maps": """
+        query Maps {
+            maps {
                 id
                 tarkovDataId
                 name
                 normalizedName
+                wiki
+                description
+                enemies
+                raidDuration
+                players
+                bosses {
+                    boss {
+                        id
+                        name
+                    }
+                }
+                nameId
+                accessKeys {
+                    id
+                    name
+                }
+                accessKeysMinPlayerLevel
+                spawns {
+                    zoneName
+                    position {
+                        x
+                        y
+                        z
+                    }
+                    sides
+                    categories
+                }
+                extracts {
+                    id
+                    name
+                    faction
+                    switches {
+                        id
+                        name
+                        switchType
+                        activatedBy {
+                            id
+                            name
+                        }
+                        activates{
+                            operation
+                            target {
+                                ...on MapSwitch {
+                                    id
+                                    name
+                                }
+                                ...on MapExtract {
+                                    id
+                                    name
+                                }
+                            }
+                        }
+                    }
+                }
+                locks {
+                    lockType
+                    key {
+                        id
+                        name
+                    }
+                    needsPower
+                    position {
+                        x
+                        y
+                        z
+                    }
+                }
+                switches {
+                    id
+                    name
+                    switchType
+                    activatedBy {
+                        id
+                        name
+                    }
+                    activates{
+                        operation
+                        target {
+                            ...on MapSwitch {
+                                id
+                                name
+                            }
+                            ...on MapExtract {
+                                id
+                                name
+                            }
+                        }
+                    }
+                }
+                hazards {
+                    hazardType
+                    name
+                    position {
+                        x
+                        y
+                        z
+                    }
+                }
+                lootContainers {
+                    lootContainer {
+                        id
+                        name
+                        normalizedName
+                    }
+                    position {
+                        x
+                        y
+                        z
+                    }
+                }
+                stationaryWeapons {
+                    stationaryWeapon {
+                        id
+                        name
+                        shortName
+                    }
+                    position {
+                        x
+                        y
+                        z
+                    }
+                }
+
+            }
+        }
+        """,
+    "tasks": """
+        query Tasks {
+            tasks {
+                id
+                tarkovDataId
+                name
+                normalizedName
+                trader {
+                    id
+                    name
+                }
+                map {
+                    id
+                    name
+                }
+                experience
+                wikiLink
+                minPlayerLevel
+                taskRequirements {
+                    task {
+                        id
+                        name
+                    }
+                    status
+                }
+                traderRequirements {
+                    id
+                    trader {
+                        id
+                        name
+                    }
+                    requirementType
+                    compareMethod
+                    value
+                }
+                objectives {
+                    id
+                    type
+                    description
+                    maps {
+                        id
+                        name
+                    }
+                    optional
+                }
+                startRewards {
+                    traderStanding {
+                        trader {
+                            id
+                            name
+                        }
+                        standing
+                    }
+                    items {
+                        item {
+                            id
+                            name
+                        }
+                        count
+                        quantity
+                    }
+                    offerUnlock {
+                        id
+                        trader {
+                            id
+                            name
+                        }
+                        level
+                        item {
+                            id
+                            name
+                        }
+                    }
+                    skillLevelReward {
+                        name
+                        level
+                    }
+                    traderUnlock {
+                        id
+                        name
+                    }
+                    craftUnlock {
+                        id
+                    }
+                }
+                finishRewards {
+                    traderStanding {
+                        trader {
+                            id
+                            name
+                        }
+                        standing
+                    }
+                    items {
+                        item {
+                            id
+                            name
+                        }
+                        count
+                        quantity
+                    }
+                    offerUnlock {
+                        id
+                        trader {
+                            id
+                            name
+                        }
+                        level
+                        item {
+                            id
+                            name
+                        }
+                    }
+                    skillLevelReward {
+                        name
+                        level
+                    }
+                    traderUnlock {
+                        id
+                        name
+                    }
+                    craftUnlock {
+                        id
+                    }
+                }
+                failConditions {
+                    id
+                    type
+                    description
+                    maps {
+                        id
+                        name
+                    }
+                    optional
+                }
+                failureOutcome {
+                    traderStanding {
+                        trader {
+                            id
+                            name
+                        }
+                        standing
+                    }
+                    items {
+                        item {
+                            id
+                            name
+                        }
+                        count
+                        quantity
+                    }
+                    offerUnlock {
+                        id
+                        trader {
+                            id
+                            name
+                        }
+                        level
+                        item {
+                            id
+                            name
+                        }
+                    }
+                    skillLevelReward {
+                        name
+                        level
+                    }
+                    traderUnlock {
+                        id
+                        name
+                    }
+                    craftUnlock {
+                        id
+                    }
+                }
+                restartable
+                factionName
+                kappaRequired
+                lightkeeperRequired
+
+            }
+        }
+        """,
+    "traders": """
+        query Traders {
+            traders {
+                id
+                name
+                normalizedName
+                description
                 resetTime
+                currency {
+                    name
+                }
                 discount
                 levels {
                     id
                     level
+                    requiredPlayerLevel
+                    requiredReputation
+                    requiredCommerce
                     payRate
-                }
-            }
-        }  
-            """
-    )
-    return query
-
-
-def get_hideout():
-    query = gql(
-        """
-        query Hideout {
-            hideoutStations {
-                id
-                tarkovDataId
-                name
-                levels {
-                    id
-                    tarkovDataId
-                    level
-                }
-            }
-        }"""
-    )
-    return query
-
-
-def get_flea():
-    query = gql(
-        """
-                query flea {
-                    fleaMarket {
-                    minPlayerLevel
-                    enabled
-                    sellOfferFeeRate
-                    sellRequirementFeeRate
-                }
-            }
-            """
-    )
-    return query
-
-
-def get_barters():
-    query = gql(
-        """
-        query StashBarters {
-            barters {
-                id
-                trader {
-                    id
-                }
-                level
-                taskUnlock {
-                    id
-                }
-                requiredItems {
-                    item {
+                    insuranceRate
+                    repairCostMultiplier
+                    barters {
                         id
                     }
-                    attributes {
+                    cashOffers {
+                        item {
+                            id
+                            name
+                        }
+                    }
+                }
+                reputationLevels {
+                    ...on TraderReputationLevelFence {
+                        minimumReputation
+                        scavCooldownModifier
+                        scavCaseTimeModifier
+                        extractPriceModifier
+                        scavFollowChance
+                        scavEquipmentSpawnChanceModifier
+                        priceModifier
+                        hostileBosses
+                        hostileScavs
+                        scavAttackSupport
+                        availableScavExtracts
+                        btrEnabled
+                        btrDeliveryDiscount
+                        btrDeliveryGridSize {
+                            x
+                            y
+                            z
+                        }
+                        btrTaxiDiscount
+                        btrCoveringFireDiscount
+                    }
+                }
+                barters {
+                    id
+                }
+                cashOffers {
+                    item {
+                        id
                         name
-                        value
                     }
-                    count
-                }
-                rewardItems {
-                    item {
+                    minTraderLevel
+                    price
+                    currency
+                    currencyItem {
+                        id
+                        name
+                    }
+                    priceRUB
+                    taskUnlock {
                         id
                     }
-                    count
+                }
+                tarkovDataId
+            }
+        }
+    """,
+    "flea": """
+        query Flea {
+            fleaMarket {
+                name
+                normalizedName
+                minPlayerLevel
+                enabled
+                sellOfferFeeRate
+                sellRequirementFeeRate
+                reputationLevels {
+                    offers
+                    minRep
+                    maxRep
                 }
             }
         }
-    """
-    )
-    return query
-
-
-def get_crafts():
-    query = gql(
-        """query StashCrafts {
-        crafts {
-            id
-            station {
-                id
-            }
-            level
-            duration
-            requiredItems {
-                item {
-                    id
-                }
-                count
-                attributes {
-                    type
-                    value
-                }
-            }
-            rewardItems {
-                item {
-                    id
-                }
-                count
-            }
-        }
-    }"""
-    )
-    return query
-
+    """,
+}
 
 maps = (
     "https://raw.githubusercontent.com/the-hideout/tarkov-dev/master/src/data/maps.json"
 )
+
+
+def update(field="all"):
+    if field == "all":
+        return tdev_queries
+    try:
+        return tdev_queries[field]
+    except IndexError:
+        return None
