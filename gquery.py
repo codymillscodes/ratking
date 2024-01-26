@@ -96,6 +96,10 @@ tdev_queries = {
                     constructionTime
                     itemRequirements {
                         id
+                        item {
+                            id
+                            name
+                        }
                         count
                         quantity
                     }
