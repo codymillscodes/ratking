@@ -18,6 +18,7 @@ def main():
             field = " ".join(command.split()[1:])
             c.update(field)
         elif command.startswith("quit"):
+            c.write_save()
             sys.exit()
         elif command.startswith("i"):
             item = " ".join(command.split()[1:])
@@ -37,8 +38,14 @@ def main():
             task = " ".join(command.split()[1:])
             c.add_task(task)
         elif command.startswith("ni"):
+            maps = None
+            if len(command.split()) > 2:
+                maps = command.split()[-1:][0]
+                command.split()[1:].pop()
             q = " ".join(command.split()[1:])
-            c.needed_items(q)
+            c.needed_items(q, maps)
+        elif command.startswith("save"):
+            c.write_save()
 
         else:
             print("Unknown command.")

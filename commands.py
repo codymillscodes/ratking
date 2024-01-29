@@ -106,13 +106,14 @@ def complete_task(task):
     with open("db/tasks.json") as f:
         tasks = json.load(f)
     for t in tasks["tasks"]:
-        if t["name"] == task:
+        if t["name"].lower() == task:
             task_id = t["id"]
             print("Found task.")
             break
     if task_id:
         active_save["tasks_complete"].append(task_id)
         print(f"Added {task} with id: {task_id}")
+        active_save["tasks_active"].remove(task_id)
         write_save(active_save)
     else:
         print("Couldnt find task. Typo?")
@@ -142,23 +143,33 @@ def add_task(task):
         print("Couldnt find task. Typo?")
 
 
-def needed_items(q):
+def needed_items(q, maps=None):
     global active_save
-    task_items = []
-    hideout_items = []
     with open("db/tasks.json") as f:
         tasks = json.load(f)
     with open("db/hideout.json") as f:
         hideout = json.load(f)
-    if q == 't' or q == '':
-        for a in active_save['tasks_active']:
+    if q == "t" or q == "":
+        for a in active_save["tasks_active"]:
             for t in tasks["tasks"]:
                 if t["id"] == a:
-                    print(f"\n{t['name'].upper()}\nGiver: {t['trader']['name']}\n")
-                    for ob in t['objectives']:
-                        print(ob['description'])
+                    task_map = "Any"
+                    if t["map"]:
+                        task_map = t["map"]["name"]
+                    if maps and maps == task_map.lower():
+                        print(
+                            f"\n{t['name'].upper()}\nGiver: {t['trader']['name']} | Map: {task_map}\n"
+                        )
+                        for ob in t["objectives"]:
+                            print(ob["description"])
+                    else:
+                        print(
+                            f"\n{t['name'].upper()}\nGiver: {t['trader']['name']} | Map: {task_map}\n"
+                        )
+                        for ob in t["objectives"]:
+                            print(ob["description"])
 
-    if q == 'h' or q == '':
+    if q == "h" or q == "":
         for h in active_save["hideout"]:
             for o in hideout["hideoutStations"]:
                 if h == o["name"].lower():
@@ -167,6 +178,7 @@ def needed_items(q):
                             print(f'\n[{h.upper()}] {l["level"]}')
                             for i in l["itemRequirements"]:
                                 print(i["count"], i["item"]["name"])
+
 
 def init_save():
     global active_save
@@ -225,7 +237,10 @@ def init_save():
         active_save = save
 
 
-def write_save(save):
+def write_save(save=None):
+    if not save:
+        global active_save
+        save = active_save
     with open("save.json", "w") as f:
         json.dump(save, f)
 
