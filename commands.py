@@ -130,7 +130,7 @@ def add_task(task):
     with open("db/tasks.json") as f:
         tasks = json.load(f)
     for t in tasks["tasks"]:
-        if t["name"] == task:
+        if t["name"].lower() == task:
             task_id = t["id"]
             print("Found task.")
             break
@@ -142,7 +142,7 @@ def add_task(task):
         print("Couldnt find task. Typo?")
 
 
-def needed_items():
+def needed_items(q):
     global active_save
     task_items = []
     hideout_items = []
@@ -150,20 +150,23 @@ def needed_items():
         tasks = json.load(f)
     with open("db/hideout.json") as f:
         hideout = json.load(f)
+    if q == 't' or q == '':
+        for a in active_save['tasks_active']:
+            for t in tasks["tasks"]:
+                if t["id"] == a:
+                    print(f"\n{t['name'].upper()}\nGiver: {t['trader']['name']}\n")
+                    for ob in t['objectives']:
+                        print(ob['description'])
 
-#    for a in active_save['tasks_active']:
-#        for t in tasks:
-#            if t["id"] == a:
-
-
-    for h in active_save["hideout"]:
-        for o in hideout["hideoutStations"]:
-            if h == o["name"].lower():
-                for l in o["levels"]:
-                    if l["level"] == active_save["hideout"][h] + 1:
-                        print(f'\n[{h.upper()}] {l["level"]}')
-                        for i in l["itemRequirements"]:
-                            print(i["count"], i["item"]["name"])
+    if q == 'h' or q == '':
+        for h in active_save["hideout"]:
+            for o in hideout["hideoutStations"]:
+                if h == o["name"].lower():
+                    for l in o["levels"]:
+                        if l["level"] == active_save["hideout"][h] + 1:
+                            print(f'\n[{h.upper()}] {l["level"]}')
+                            for i in l["itemRequirements"]:
+                                print(i["count"], i["item"]["name"])
 
 def init_save():
     global active_save
