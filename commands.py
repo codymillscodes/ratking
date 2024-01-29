@@ -156,7 +156,7 @@ def needed_items(q, maps=None):
                     task_map = "Any"
                     if t["map"]:
                         task_map = t["map"]["name"]
-                    if maps and maps == task_map.lower():
+                    if maps and maps in task_map.lower():
                         print(
                             f"\n{t['name'].upper()}\nGiver: {t['trader']['name']} | Map: {task_map}\n"
                         )
@@ -169,6 +169,8 @@ def needed_items(q, maps=None):
                         for ob in t["objectives"]:
                             print(ob["description"])
 
+                        print("---")
+
     if q == "h" or q == "":
         for h in active_save["hideout"]:
             for o in hideout["hideoutStations"]:
@@ -178,6 +180,8 @@ def needed_items(q, maps=None):
                             print(f'\n[{h.upper()}] {l["level"]}')
                             for i in l["itemRequirements"]:
                                 print(i["count"], i["item"]["name"])
+
+                            print("---")
 
 
 def init_save():
