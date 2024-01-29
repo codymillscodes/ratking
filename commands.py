@@ -151,14 +151,19 @@ def needed_items():
     with open("db/hideout.json") as f:
         hideout = json.load(f)
 
-    # for a in active_save['tasks_active']:
-    #     for t in tasks:
-    #         if t["id"] == a:
+#    for a in active_save['tasks_active']:
+#        for t in tasks:
+#            if t["id"] == a:
 
-    # for h in active_save["hideout"]:
-    #     for o in hideout:
-    #         if
 
+    for h in active_save["hideout"]:
+        for o in hideout["hideoutStations"]:
+            if h == o["name"].lower():
+                for l in o["levels"]:
+                    if l["level"] == active_save["hideout"][h] + 1:
+                        print(f'\n[{h.upper()}] {l["level"]}')
+                        for i in l["itemRequirements"]:
+                            print(i["count"], i["item"]["name"])
 
 def init_save():
     global active_save
