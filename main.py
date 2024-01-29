@@ -37,7 +37,8 @@ def main():
             task = " ".join(command.split()[1:])
             c.add_task(task)
         elif command.startswith("ni"):
-            c.needed_items()
+            q = " ".join(command.split()[1:])
+            c.needed_items(q)
 
         else:
             print("Unknown command.")
