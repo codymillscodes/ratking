@@ -184,6 +184,50 @@ def needed_items(q, maps=None):
                             print("---")
 
 
+def flea_cat(c):
+    cats = [
+        "gun",
+        "wearable",
+        "ammobox",
+        "keys",
+        "ammo",
+        "grenade",
+        "mods",
+        "provisions",
+        "armor",
+        "rig",
+        "backpack",
+        "meds",
+        "injectors",
+        "barter",
+        "glasses",
+        "helmet",
+        "container",
+        "armorplate",
+        "preset",
+    ]
+    if c.lower() not in cats:
+        print("Not a correct category. Try: ", cats)
+    else:
+        with open("db/items.json") as f:
+            items = json.load(f)
+
+        # Create an empty dictionary to store the items and their prices
+        item_dict = {}
+        for i in items["items"]:
+            if c in i["types"] and "noFlea" not in i["types"]:
+                for t in i["sellFor"]:
+                    if t["vendor"]["name"] == "Flea Market":
+                        # Add the item name and priceRUB to the dictionary
+                        item_dict[i["name"]] = t["priceRUB"]
+
+        # Sort the dictionary by value in descending order and store the result in a list of tuples
+        sorted_items = sorted(item_dict.items(), key=lambda x: x[1], reverse=False)
+        # Loop over the sorted_items list and print the item name and priceRUB from each tuple
+        for item, price in sorted_items:
+            print(f"{item} [{price}]")
+
+
 def init_save():
     global active_save
     if not os.path.isfile("save.json"):

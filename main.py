@@ -46,7 +46,9 @@ def main():
             c.needed_items(q, maps)
         elif command.startswith("save"):
             c.write_save()
-
+        elif command.startswith("fcat"):
+            cat = " ".join(command.split()[1:])
+            c.flea_cat(cat)
         else:
             print("Unknown command.")
 
